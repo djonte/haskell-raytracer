@@ -4,7 +4,7 @@ The goal is to follow the ["Ray Tracing in One Weekend" guide](https://raytracin
 
 To furthermore make the project fairly unique, I will make sure that my images are different scenes. 
 
-## Images generated so far
+# Images generated so far
 ### A gradient image
 ...
 
