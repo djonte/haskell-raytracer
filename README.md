@@ -12,10 +12,10 @@ To furthermore make the project fairly unique, I will make sure that my images a
 
 
 # Implementation
-The solution will be implemented using Haskell.<br>
-**Image generation:**
-Haskell Image Processing Library (HIP)<br>
-**3d Vectors**
-Linear<br>
-**Resolver**
+The solution will be implemented using Haskell.
+### Image generation
+Haskell Image Processing Library (HIP)
+### 3d Vectors
+Linear
+### Resolver
 lts-20.26
