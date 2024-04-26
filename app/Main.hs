@@ -15,7 +15,7 @@ gradient :: Int -> Int -> Pixel RGB Double
 gradient i j =
   let 
     (width, height) = (256, 256) -- width and height of image
-    r = fromIntegral i / (width - 1)
-    g = fromIntegral j / (height - 1)
-    b = r * g -- it follows that b <= 1 since r, g <= 1
+    r = fromIntegral j / (width - 1) -- this should be read that the % of red increases with the column j
+    g = fromIntegral i / (height - 1)
+    b = 1 - fromIntegral j / (width - 1) -- it follows that b <= 1 since r, g <= 1
    in PixelRGB r g b
