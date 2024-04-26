@@ -1,5 +1,5 @@
 name:                haskell-raytracer
-version:             0.1.0.1
+version:             0.1.0.2
 github:              "djonte/haskell-raytracer"
 license:             BSD-3-Clause
 author:              "djonte"

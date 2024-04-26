@@ -16,3 +16,6 @@ and this project adheres to the
 ## 0.1.0.1 - 2024-04-26
 - Added author name to various places
 - Updated readme to include run instructions
+
+## 0.1.0.2 - 2024-04-26
+- Fixed run instructions
