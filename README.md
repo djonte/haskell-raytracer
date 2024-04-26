@@ -6,7 +6,9 @@ To furthermore make the project fairly unique, I will make sure that my images a
 
 # Images generated so far
 ### A gradient image
-![image](https://github.com/djonte/haskell-raytracer/assets/90456387/f694ae3c-57dd-4d5b-b349-ebb24b0f1d3e)
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/554df427-f38b-481f-aa6b-00ec998beeeb)
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/da414c36-f2cb-4c7c-8c83-736c679c465e)
+
 
 ###
 
