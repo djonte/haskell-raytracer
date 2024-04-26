@@ -8,7 +8,38 @@ To furthermore make the project fairly unique, I will make sure that my images a
 ### A gradient image
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/f694ae3c-57dd-4d5b-b349-ebb24b0f1d3e)
 
-###  
+###
+
+## How to Run the Project
+
+1. **Clone the repository**
+
+   Open your terminal and run the following command:
+
+   ```bash
+   git clone https://github.com/djonte/haskell-raytracer.git
+   ```
+
+2. **Navigate to the project directory**
+    ```bash
+    cd haskell-raytracer
+    ```
+
+3. **Install the dependancies**
+    ```bash
+    stack install
+    ```
+
+4. **Build the project**
+    ```bash
+    stack build
+    ```
+
+5. **Run the project**
+    ```bash
+    stack run
+    ```
+
 
 
 # Implementation
