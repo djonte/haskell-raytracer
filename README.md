@@ -13,9 +13,9 @@ To furthermore make the project fairly unique, I will make sure that my images a
 
 # Implementation
 The solution will be implemented using Haskell.
+### Resolver
+lts-20.26
 ### Image generation
 Haskell Image Processing Library (HIP)
 ### 3d Vectors
 Linear
-### Resolver
-lts-20.26
