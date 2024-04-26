@@ -10,7 +10,7 @@ To furthermore make the project fairly unique, I will make sure that my images a
 
 ###
 
-## How to Run the Project
+## How to run the Project
 
 1. **Clone the repository**
 
@@ -30,12 +30,7 @@ To furthermore make the project fairly unique, I will make sure that my images a
     stack install
     ```
 
-4. **Build the project**
-    ```bash
-    stack build
-    ```
-
-5. **Run the project**
+5. **Build and run the project**
     ```bash
     stack run
     ```
@@ -48,5 +43,5 @@ The solution will be implemented using Haskell.
 lts-20.26
 ### Image generation
 Haskell Image Processing Library (HIP)
-### 3d Vectors
+### 3d vectors
 Linear
