@@ -4,7 +4,9 @@ module Main (main) where
 
 import Control.Lens
 import Graphics.Image as I
+import Linear.Metric as L (normalize)
 import Linear.V3
+import Linear.Vector
 
 -- Aliases for V3
 type Color = V3 Double -- this might not be needed
@@ -31,28 +33,35 @@ at ray t = origin ray + direction ray * t
 
 -- Function calculates the color of a given ray
 rayColor :: Ray -> Color
-rayColor ray = V3 0 0 0
+rayColor ray =
+  let unit_dir = L.normalize $ direction ray
+      a = 0.5 * (unit_dir ^. _y + 1.0)
+      -- toColor = V3 1.0 1.0 1.0 og 
+      -- fromColor = V3 0.5 0.7 1.0
+      fromColor = V3 (127/255) (220/255) (232/255)
+      toColor = V3 (13 / 255) (70 / 255) (158 / 255)
+   in (1.0 - a) *^ toColor + a *^ fromColor
 
 main :: IO ()
 main = do
   let aspect_ratio :: Double
       aspect_ratio = 16.0 / 9.0 -- 16/9 aspect ratio
   let width :: Integer
-      width = 800 -- image width
+      width = 400 -- image width
   let height :: Integer
       height =
         let temp = floor (fromIntegral width / aspect_ratio)
          in max temp 1 -- height should be at least 1
+  putStrLn $ show width
+  putStrLn $ show height
 
   -- Camera
   let focal_length :: Double
       focal_length = 1.0
-  let viewport_height :: Double
-      viewport_height = 2.0
-  let vw_width :: Double
-      vw_width = 2.0 -- Viewport width
   let vw_height :: Double
-      vw_height = vw_width * (fromIntegral width / fromIntegral height) -- Viewport height
+      vw_height = 2.0 -- Viewport width
+  let vw_width :: Double
+      vw_width = vw_height * (fromIntegral width / fromIntegral height) -- Viewport height
   let camera_center :: Point
       camera_center = V3 0 0 0
 
@@ -70,7 +79,7 @@ main = do
 
   -- top left corner of view port in relation to camera center
   let vw_top_left :: V3 Double
-      vw_top_left = camera_center - V3 0 0 focal_length - vw_u / 2 - vw_v / 2
+      vw_top_left = camera_center - V3 0 0 focal_length - vw_u / 2.0 - vw_v / 2.0
   let px00_loc :: Point
       px00_loc = vw_top_left + 0.5 * (px_delta_u + px_delta_v) -- offset from side is half of delta
 
@@ -80,12 +89,13 @@ main = do
 
   -- Image generation
   let image :: Image VU RGB Double
-      image = makeImageR VU (256, 256) (uncurry (rayGradient rt)) -- uncurry will transform gradient into (Int, Int) -> ...
-  writeImage "app/images/raytracing.png" image
+      image = makeImageR VU (fromInteger height, fromInteger width) (uncurry (rayGradient rt)) -- uncurry will transform gradient into (Int, Int) -> ...
+  writeImage "app/images/raytracing.jpg" image
 
 -- Takes a RayTracer, a pixel location i and j, returns a PixelRGB type with the color for that ray
 rayGradient :: RayTracer -> Int -> Int -> Pixel RGB Double
-rayGradient rt i j =
+rayGradient rt j i =
+  -- j is rows, i is columns
   let px_center = px00_loc rt + (fromIntegral i * px_delta_u rt) + (fromIntegral j * px_delta_v rt)
       ray_direction = px_center - camera_center rt
       ray = Ray (camera_center rt) ray_direction
