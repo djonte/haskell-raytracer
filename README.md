@@ -9,6 +9,9 @@ To furthermore make the project fairly unique, I will make sure that my images a
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/554df427-f38b-481f-aa6b-00ec998beeeb)
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/da414c36-f2cb-4c7c-8c83-736c679c465e)
 
+### A gradient image generated using Y-pos of ray
+![raytracing-gradient](https://github.com/djonte/haskell-raytracer/assets/90456387/6eee13b6-4ce0-46ba-96df-23885d7fb25d)
+
 
 ###
 
