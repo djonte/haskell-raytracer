@@ -13,7 +13,9 @@ To furthermore make the project fairly unique, I will make sure that my images a
 ![raytracing-gradient](https://github.com/djonte/haskell-raytracer/assets/90456387/6eee13b6-4ce0-46ba-96df-23885d7fb25d)
 
 
-###
+### A circle generated using ray tracing against hardcoded sphere
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/bf2aef8f-4df1-414e-8b76-bd9fe61d1779)
+
 
 ## How to run the Project
 
