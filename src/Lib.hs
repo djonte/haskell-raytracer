@@ -11,7 +11,7 @@ module Lib
 
 import Control.Lens hiding (at)
 import Graphics.Image as I
-import Linear.Metric as L (normalize)
+import Linear.Metric as L (normalize, Metric (dot))
 import Linear.V3
 import Linear.Vector
 
@@ -28,34 +28,46 @@ data Ray = Ray
 
 -- RayTracer data type to hold relevant constants (those that need to be visible at several places)
 data RayTracer = RayTracer
-  { px00_loc :: Point,
-    px_delta_u :: V3 Double,
-    px_delta_v :: V3 Double,
-    camera_center :: Point
+  { px00Loc :: Point,
+    pxDeltaU :: V3 Double,
+    pxDeltaV :: V3 Double,
+    cameraCenter :: Point
   }
 
 -- Returns the ray's coordinates depending on t
 at :: Ray -> V3 Double -> Point
 at ray t = origin ray + direction ray * t
 
+-- Takes a center point, a radius and a ray and calculates whether the ray hits 
+-- the circle formed by the center point and radius
+hitSphere :: Point -> Double -> Ray -> Bool
+hitSphere center radius ray = let
+    oc = center - origin ray
+    a = dot (direction ray) (direction ray)
+    b = -2.0 * dot (direction ray) oc
+    c = dot oc oc - radius * radius
+    disc = b*b - 4*a*c
+    in disc >= 0
+
 -- Function calculates the color of a given ray
+-- Uses hitSphere to check if a sphere is hit by the ray
 rayColor :: Ray -> Color
 rayColor ray =
-  let unit_dir = L.normalize $ direction ray
-      a = 0.5 * (unit_dir ^. _y + 1.0)
-      -- toColor = V3 1.0 1.0 1.0 og 
-      -- fromColor = V3 0.5 0.7 1.0
+  let unitDir = L.normalize $ direction ray
+      a = 0.5 * (unitDir ^. _y + 1.0)
       fromColor = V3 (127/255) (220/255) (232/255)
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
-   in (1.0 - a) *^ toColor + a *^ fromColor
+    in if hitSphere (V3 0.0 0.0 (-1.0)) 0.7 ray
+      then V3 0 0 1.0
+      else (1.0 - a) *^ toColor + a *^ fromColor
 
 -- Takes a RayTracer, a pixel location i and j, returns a PixelRGB type with the color for that ray
 rayGradient :: RayTracer -> Int -> Int -> Pixel RGB Double
 rayGradient rt j i =
   -- j is rows, i is columns
-  let px_center = px00_loc rt + (fromIntegral i * px_delta_u rt) + (fromIntegral j * px_delta_v rt)
-      ray_direction = px_center - camera_center rt
-      ray = Ray (camera_center rt) ray_direction
+  let pxCenter = px00Loc rt + (fromIntegral i * pxDeltaU rt) + (fromIntegral j * pxDeltaV rt)
+      rayDirection = pxCenter - cameraCenter rt
+      ray = Ray (cameraCenter rt) rayDirection
       px_color = rayColor ray
    in pxRGB px_color
 
