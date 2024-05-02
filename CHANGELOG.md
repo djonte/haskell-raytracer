@@ -30,3 +30,11 @@ and this project adheres to the
 ### Fixed
 - Fixed image width and height being in the wrong order, causing the image to get wrong dimensions
 - Fixed viewport width and height being mixed up
+
+
+## 0.1.2.0
+### Added
+- Created hitSphere function. The function takes a circle formed by a center point and a radius and calculates whether a given ray intersects with the circle
+### Changed
+- Renamed some functions and variables to obey Haskell's naming conventions
+- Moved reusable functions to Lib.hs, constants and IO stays in Main.hs
