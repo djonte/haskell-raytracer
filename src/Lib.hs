@@ -12,7 +12,7 @@ where
 
 import Control.Lens hiding (at)
 import Graphics.Image as I
-import Linear.Metric as L (Metric (dot), normalize)
+import Linear.Metric as L (Metric (dot, quadrance), normalize)
 import Linear.V3
 import Linear.Vector
 
@@ -44,13 +44,13 @@ at ray t = origin ray + t *^ direction ray
 hitSphere :: Point -> Double -> Ray -> Double
 hitSphere center radius ray =
   let oc = center - origin ray
-      a = dot (direction ray) (direction ray)
-      b = (-2.0) * dot (direction ray) oc
-      c = dot oc oc - radius * radius
-      disc = b * b - 4 * a * c
+      a = quadrance $ direction ray
+      h = dot (direction ray) oc
+      c = quadrance oc - radius * radius
+      disc = h * h - a*c
    in if disc < 0
         then -1.0
-        else ((-b) - sqrt disc) / (2.0 * a)
+        else (h - sqrt disc) / a
 
 -- Function calculates the color of a given ray
 -- Uses hitSphere to check if a sphere is hit by the ray
