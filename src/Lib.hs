@@ -1,17 +1,18 @@
 module Lib
-    ( Color
-    , Point
-    , Ray(..)
-    , RayTracer(..)
-    , at
-    , rayColor
-    , rayGradient
-    , gradient
-    ) where
+  ( Color,
+    Point,
+    Ray (..),
+    RayTracer (..),
+    at,
+    rayColor,
+    rayGradient,
+    gradient,
+  )
+where
 
 import Control.Lens hiding (at)
 import Graphics.Image as I
-import Linear.Metric as L (normalize, Metric (dot))
+import Linear.Metric as L (Metric (dot, quadrance), normalize)
 import Linear.V3
 import Linear.Vector
 
@@ -35,19 +36,21 @@ data RayTracer = RayTracer
   }
 
 -- Returns the ray's coordinates depending on t
-at :: Ray -> V3 Double -> Point
-at ray t = origin ray + direction ray * t
+at :: Ray -> Double -> Point
+at ray t = origin ray + t *^ direction ray
 
--- Takes a center point, a radius and a ray and calculates whether the ray hits 
+-- Takes a center point, a radius and a ray and calculates whether the ray hits
 -- the circle formed by the center point and radius
-hitSphere :: Point -> Double -> Ray -> Bool
-hitSphere center radius ray = let
-    oc = center - origin ray
-    a = dot (direction ray) (direction ray)
-    b = -2.0 * dot (direction ray) oc
-    c = dot oc oc - radius * radius
-    disc = b*b - 4*a*c
-    in disc >= 0
+hitSphere :: Point -> Double -> Ray -> Double
+hitSphere center radius ray =
+  let oc = center - origin ray
+      a = quadrance $ direction ray
+      h = dot (direction ray) oc
+      c = quadrance oc - radius * radius
+      disc = h * h - a*c
+   in if disc < 0
+        then -1.0
+        else (h - sqrt disc) / a
 
 -- Function calculates the color of a given ray
 -- Uses hitSphere to check if a sphere is hit by the ray
@@ -55,11 +58,15 @@ rayColor :: Ray -> Color
 rayColor ray =
   let unitDir = L.normalize $ direction ray
       a = 0.5 * (unitDir ^. _y + 1.0)
-      fromColor = V3 (127/255) (220/255) (232/255)
+      fromColor = V3 (127 / 255) (220 / 255) (232 / 255)
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
-    in if hitSphere (V3 0.0 0.0 (-1.0)) 0.7 ray
-      then V3 0 0 1.0
-      else (1.0 - a) *^ toColor + a *^ fromColor
+      t = hitSphere (V3 0.0 0.0 (-1.0)) 0.5 ray
+      n = L.normalize (at ray t - V3 0.0 0.0 (-1.0))
+      diff = 0.5*(n ^. _z + 1)
+      color = 0.5 * V3 0 (2*(diff**8)) (2*(diff**8))
+   in if t > 0.0
+        then color
+        else (1.0 - a) *^ toColor + a *^ fromColor
 
 -- Takes a RayTracer, a pixel location i and j, returns a PixelRGB type with the color for that ray
 rayGradient :: RayTracer -> Int -> Int -> Pixel RGB Double
@@ -67,7 +74,7 @@ rayGradient rt j i =
   -- j is rows, i is columns
   let pxCenter = px00Loc rt + (fromIntegral i * pxDeltaU rt) + (fromIntegral j * pxDeltaV rt)
       rayDirection = pxCenter - cameraCenter rt
-      ray = Ray (cameraCenter rt) rayDirection
+      ray = Ray (cameraCenter rt) (L.normalize rayDirection)
       px_color = rayColor ray
    in pxRGB px_color
 
