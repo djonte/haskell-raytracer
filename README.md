@@ -25,6 +25,7 @@ To furthermore make the project fairly unique, I will make sure that my images a
 
 #### Blue as a function of z
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/67e114a3-e36c-448c-802c-29db4b617b44)
+
 Comment: *It should be noted that it is not quite possible to see any substantial change in color in the sphere with the human eye, however upon analysis with Paint it is noticable as a slight decrease in the amount of blue moving towards the edges of the picture, in accordance with expectations. To make this easier to demonstrate I made a modification where I let the blue and green be dependant on the z coordinate of the normalized outer normals of the sphere raised to the power 8. This increases the color change per z coordinate change drastically, see below.*
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/8390661f-f8e1-466e-9be4-ef2f16751918)
 
