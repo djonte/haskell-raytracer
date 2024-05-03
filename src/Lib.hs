@@ -35,6 +35,36 @@ data RayTracer = RayTracer
     cameraCenter :: Point
   }
 
+data HitRecord = HitRecord
+  { p :: Point,
+    normal :: V3 Double,
+    t :: Double
+  }
+
+class Object a where
+  hit :: a -> Ray -> Double -> Double -> HitRecord -> Bool
+
+data Sphere = Sphere {
+  center :: Point,
+  radius :: Double
+}
+
+instance Object Sphere where
+  hit sphere ray tmin tmax hr = let
+    oc = center sphere - origin ray
+    a = quadrance $ direction ray
+    h = dot (direction ray) oc
+    c = quadrance oc - radius sphere ** 2
+    disc = h * h - a*c
+    in result where 
+      result = let
+        sqrtd = sqrt disc
+        findRoot' a' h' disc'
+          | disc' < 0 = False
+          | otherwise = (h' - sqrtd) / a' <= f
+        in findRoot' a h disc
+
+
 -- Returns the ray's coordinates depending on t
 at :: Ray -> Double -> Point
 at ray t = origin ray + t *^ direction ray
