@@ -60,9 +60,10 @@ rayColor ray =
       a = 0.5 * (unitDir ^. _y + 1.0)
       fromColor = V3 (127 / 255) (220 / 255) (232 / 255)
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
-      t = hitSphere (V3 0.0 0.0 (-1.0)) 0.7 ray
+      t = hitSphere (V3 0.0 0.0 (-1.0)) 0.5 ray
       n = L.normalize (at ray t - V3 0.0 0.0 (-1.0))
-      color = 0.5 * V3 (n ^. _x + 1) (n ^. _y + 1) (n ^. _z + 1)
+      diff = 0.5*(n ^. _z + 1)
+      color = 0.5 * V3 0 (2*(diff**8)) (2*(diff**8))
    in if t > 0.0
         then color
         else (1.0 - a) *^ toColor + a *^ fromColor
@@ -73,7 +74,7 @@ rayGradient rt j i =
   -- j is rows, i is columns
   let pxCenter = px00Loc rt + (fromIntegral i * pxDeltaU rt) + (fromIntegral j * pxDeltaV rt)
       rayDirection = pxCenter - cameraCenter rt
-      ray = Ray (cameraCenter rt) rayDirection
+      ray = Ray (cameraCenter rt) (L.normalize rayDirection)
       px_color = rayColor ray
    in pxRGB px_color
 
