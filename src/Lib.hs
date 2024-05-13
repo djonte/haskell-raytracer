@@ -42,28 +42,36 @@ data HitRecord = HitRecord
   }
 
 class Object a where
-  hit :: a -> Ray -> Double -> Double -> HitRecord -> Bool
+  hit :: a -> Ray -> Double -> Double -> HitRecord -> Maybe HitRecord
 
-data Sphere = Sphere {
-  center :: Point,
-  radius :: Double
-}
+data Sphere = Sphere
+  { center :: Point,
+    radius :: Double
+  }
 
 instance Object Sphere where
-  hit sphere ray tmin tmax hr = let
-    oc = center sphere - origin ray
-    a = quadrance $ direction ray
-    h = dot (direction ray) oc
-    c = quadrance oc - radius sphere ** 2
-    disc = h * h - a*c
-    in result where 
-      result = let
-        sqrtd = sqrt disc
-        findRoot' a' h' disc'
-          | disc' < 0 = False
-          | otherwise = (h' - sqrtd) / a' <= f
-        in findRoot' a h disc
-
+  -- hit function for a sphere
+  -- returns a hit record if the sphere is hit by the ray, otherwise Nothing
+  hit sphere ray tmin tmax hr =
+    let oc = center sphere - origin ray
+        a = quadrance $ direction ray
+        h = dot (direction ray) oc
+        c = quadrance oc - radius sphere ** 2
+        disc = h * h - a * c
+     in let sqrtd = sqrt disc
+            result
+              | disc < 0 = Nothing
+              | root1 <= tmin || root1 >= tmax = if root2 <= tmin || root2 >= tmax then Nothing else Just hr' -- if root1 is not in the interval, check root2
+              | otherwise = Just hr' -- if root1 is in the interval, return the hit record
+              where
+                root1 = (h - sqrtd) / a -- first root
+                root2 = (h + sqrtd) / a -- second root
+                hr' =
+                  let t = if root1 > tmin && root1 < tmax then root1 else root2
+                      p' = at ray t
+                      normal = (p hr - center sphere) ^/ radius sphere
+                   in HitRecord p' normal t
+         in result
 
 -- Returns the ray's coordinates depending on t
 at :: Ray -> Double -> Point
@@ -77,7 +85,7 @@ hitSphere center radius ray =
       a = quadrance $ direction ray
       h = dot (direction ray) oc
       c = quadrance oc - radius * radius
-      disc = h * h - a*c
+      disc = h * h - a * c
    in if disc < 0
         then -1.0
         else (h - sqrt disc) / a
@@ -92,8 +100,8 @@ rayColor ray =
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
       t = hitSphere (V3 0.0 0.0 (-1.0)) 0.5 ray
       n = L.normalize (at ray t - V3 0.0 0.0 (-1.0))
-      diff = 0.5*(n ^. _z + 1)
-      color = 0.5 * V3 0 (2*(diff**8)) (2*(diff**8))
+      diff = 0.5 * (n ^. _z + 1)
+      color = 0.5 * V3 0 (2 * (diff ** 8)) (2 * (diff ** 8))
    in if t > 0.0
         then color
         else (1.0 - a) *^ toColor + a *^ fromColor
