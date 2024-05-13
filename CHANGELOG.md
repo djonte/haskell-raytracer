@@ -52,4 +52,5 @@ and this project adheres to the
 ### Added
 - Object class with one function, hit
 - Sphere data type (Object instance) that implements hit
-- Hit normals are adjusted dependion on if the hit was from the inside or outside of sphere, this is also stored in the HitRecord data type
+- Hit normals are adjusted depending on if the hit was from the inside or outside of sphere, this is also stored in the HitRecord data type
+- Hittable list implemented, hit function implemented on the list

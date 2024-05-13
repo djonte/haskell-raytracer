@@ -56,6 +56,22 @@ data Sphere = Sphere
     radius :: Double
   }
 
+newtype HitList a = HitList {objects :: [a]}
+
+clear :: HitList a
+clear = HitList [] -- redundant?
+
+instance (Object a) => Object (HitList a) where
+  hit (HitList []) _ _ _ _ = Nothing
+  hit (HitList l) ray tmin tmax hr = hit' l ray tmin tmax hr False tmax
+    where
+      hit' [] _ _ _ hr' hitAnything _ = if hitAnything then Just hr' else Nothing
+      hit' (x : xs) ray' tmin' tmax' hr' hitAnything closest =
+        let result = hit x ray' tmin' tmax' hr'
+         in case result of
+              Nothing -> hit' xs ray tmin tmax hr' hitAnything closest
+              Just hitRec -> hit' xs ray tmin tmax hitRec True (t hitRec) -- investigate which hr is being used... hit shouldnt use hr so this should be fine
+
 instance Object Sphere where
   -- hit function for a sphere
   -- returns a hit record if the sphere is hit by the ray, otherwise Nothing
@@ -77,7 +93,7 @@ instance Object Sphere where
                   let t = if root1 > tmin && root1 < tmax then root1 else root2
                       p' = at ray t
                       normal = (p' - center sphere) ^/ radius sphere
-                      hr = HitRecord p' normal t True
+                      hr = hr {p = p', normal = normal, t = t}
                    in setFaceNormal hr ray normal
          in result
 
