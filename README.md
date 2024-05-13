@@ -34,6 +34,10 @@ Comment: *It should be noted that it is not quite possible to see any substantia
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/47f05f95-d692-4b4a-aed8-203e97d7213a)
 
 
+#### 2 spheres, both with green and blue as a function of y
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/ef5828dc-4f2a-42fc-8f53-7519c19aedee)
+
+
 ## How to run the project
 
 1. **Clone the repository**
