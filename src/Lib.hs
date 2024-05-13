@@ -69,7 +69,7 @@ instance Object Sphere where
                 hr' =
                   let t = if root1 > tmin && root1 < tmax then root1 else root2
                       p' = at ray t
-                      normal = (p hr - center sphere) ^/ radius sphere
+                      normal = (p' - center sphere) ^/ radius sphere
                    in HitRecord p' normal t
          in result
 
@@ -98,13 +98,20 @@ rayColor ray =
       a = 0.5 * (unitDir ^. _y + 1.0)
       fromColor = V3 (127 / 255) (220 / 255) (232 / 255)
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
-      t = hitSphere (V3 0.0 0.0 (-1.0)) 0.5 ray
-      n = L.normalize (at ray t - V3 0.0 0.0 (-1.0))
-      diff = 0.5 * (n ^. _z + 1)
-      color = 0.5 * V3 0 (2 * (diff ** 8)) (2 * (diff ** 8))
-   in if t > 0.0
-        then color
-        else (1.0 - a) *^ toColor + a *^ fromColor
+      sphere1 = Sphere (V3 (-0.6) 0.0 (-1.0)) 0.3
+      sphere2 = Sphere (V3 0.6 0.0 (-1.0)) 0.3
+      tMaybe = (hit sphere1 ray (-3.0) 1000000.0 (HitRecord (V3 0.0 0.0 0.0) (V3 0.0 0.0 0.0) 0.0), hit sphere2 ray (-3.0) 1000000.0 (HitRecord (V3 0.0 0.0 0.0) (V3 0.0 0.0 0.0) 0.0))
+   in case tMaybe of
+        (Nothing, Nothing) -> (1.0 - a) *^ toColor + a *^ fromColor
+        (Just hr, Nothing) ->
+          let diff = 0.5 * (normal hr ^. _y + 1)
+              color = V3 0 (2 * (diff ** 1)) (2 * (diff ** 1))
+           in color
+        (Nothing, Just hr) ->
+          let diff = 0.5 * (normal hr ^. _y + 1)
+              color = V3 0 (2 * (diff ** 1)) (2 * (diff ** 1))
+           in color
+        (Just _, Just _) -> (1.0 - a) *^ toColor + a *^ fromColor
 
 -- Takes a RayTracer, a pixel location i and j, returns a PixelRGB type with the color for that ray
 rayGradient :: RayTracer -> Int -> Int -> Pixel RGB Double
