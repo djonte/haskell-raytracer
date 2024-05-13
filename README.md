@@ -9,7 +9,7 @@ To furthermore make the project fairly unique, I will make sure that my images a
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/554df427-f38b-481f-aa6b-00ec998beeeb)
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/da414c36-f2cb-4c7c-8c83-736c679c465e)
 
-### A gradient image generated using Y-pos of ray
+### A gradient image generated using y-pos of ray
 ![raytracing-gradient](https://github.com/djonte/haskell-raytracer/assets/90456387/6eee13b6-4ce0-46ba-96df-23885d7fb25d)
 
 
@@ -34,7 +34,11 @@ Comment: *It should be noted that it is not quite possible to see any substantia
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/47f05f95-d692-4b4a-aed8-203e97d7213a)
 
 
-## How to run the Project
+#### 2 spheres, both with green and blue as a function of y
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/ef5828dc-4f2a-42fc-8f53-7519c19aedee)
+
+
+## How to run the project
 
 1. **Clone the repository**
 

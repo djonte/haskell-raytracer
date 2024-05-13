@@ -35,6 +35,44 @@ data RayTracer = RayTracer
     cameraCenter :: Point
   }
 
+data HitRecord = HitRecord
+  { p :: Point,
+    normal :: V3 Double,
+    t :: Double
+  }
+
+class Object a where
+  hit :: a -> Ray -> Double -> Double -> HitRecord -> Maybe HitRecord
+
+data Sphere = Sphere
+  { center :: Point,
+    radius :: Double
+  }
+
+instance Object Sphere where
+  -- hit function for a sphere
+  -- returns a hit record if the sphere is hit by the ray, otherwise Nothing
+  hit sphere ray tmin tmax hr =
+    let oc = center sphere - origin ray
+        a = quadrance $ direction ray
+        h = dot (direction ray) oc
+        c = quadrance oc - radius sphere ** 2
+        disc = h * h - a * c
+     in let sqrtd = sqrt disc
+            result
+              | disc < 0 = Nothing
+              | root1 <= tmin || root1 >= tmax = if root2 <= tmin || root2 >= tmax then Nothing else Just hr' -- if root1 is not in the interval, check root2
+              | otherwise = Just hr' -- if root1 is in the interval, return the hit record
+              where
+                root1 = (h - sqrtd) / a -- first root
+                root2 = (h + sqrtd) / a -- second root
+                hr' =
+                  let t = if root1 > tmin && root1 < tmax then root1 else root2
+                      p' = at ray t
+                      normal = (p' - center sphere) ^/ radius sphere
+                   in HitRecord p' normal t
+         in result
+
 -- Returns the ray's coordinates depending on t
 at :: Ray -> Double -> Point
 at ray t = origin ray + t *^ direction ray
@@ -47,7 +85,7 @@ hitSphere center radius ray =
       a = quadrance $ direction ray
       h = dot (direction ray) oc
       c = quadrance oc - radius * radius
-      disc = h * h - a*c
+      disc = h * h - a * c
    in if disc < 0
         then -1.0
         else (h - sqrt disc) / a
@@ -60,13 +98,20 @@ rayColor ray =
       a = 0.5 * (unitDir ^. _y + 1.0)
       fromColor = V3 (127 / 255) (220 / 255) (232 / 255)
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
-      t = hitSphere (V3 0.0 0.0 (-1.0)) 0.5 ray
-      n = L.normalize (at ray t - V3 0.0 0.0 (-1.0))
-      diff = 0.5*(n ^. _z + 1)
-      color = 0.5 * V3 0 (2*(diff**8)) (2*(diff**8))
-   in if t > 0.0
-        then color
-        else (1.0 - a) *^ toColor + a *^ fromColor
+      sphere1 = Sphere (V3 (-0.6) 0.0 (-1.0)) 0.3
+      sphere2 = Sphere (V3 0.6 0.0 (-1.0)) 0.3
+      tMaybe = (hit sphere1 ray (-3.0) 1000000.0 (HitRecord (V3 0.0 0.0 0.0) (V3 0.0 0.0 0.0) 0.0), hit sphere2 ray (-3.0) 1000000.0 (HitRecord (V3 0.0 0.0 0.0) (V3 0.0 0.0 0.0) 0.0))
+   in case tMaybe of
+        (Nothing, Nothing) -> (1.0 - a) *^ toColor + a *^ fromColor
+        (Just hr, Nothing) ->
+          let diff = 0.5 * (normal hr ^. _y + 1)
+              color = V3 0 (2 * (diff ** 1)) (2 * (diff ** 1))
+           in color
+        (Nothing, Just hr) ->
+          let diff = 0.5 * (normal hr ^. _y + 1)
+              color = V3 0 (2 * (diff ** 1)) (2 * (diff ** 1))
+           in color
+        (Just _, Just _) -> (1.0 - a) *^ toColor + a *^ fromColor
 
 -- Takes a RayTracer, a pixel location i and j, returns a PixelRGB type with the color for that ray
 rayGradient :: RayTracer -> Int -> Int -> Pixel RGB Double
