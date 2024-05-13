@@ -38,8 +38,15 @@ data RayTracer = RayTracer
 data HitRecord = HitRecord
   { p :: Point,
     normal :: V3 Double,
-    t :: Double
+    t :: Double,
+    frontFace :: Bool
   }
+
+setFaceNormal :: HitRecord -> Ray -> V3 Double -> HitRecord
+setFaceNormal hr ray outwardNormal =
+  if dot (direction ray) outwardNormal < 0
+    then hr {frontFace = True, normal = outwardNormal}
+    else hr {frontFace = False, normal = -outwardNormal}
 
 class Object a where
   hit :: a -> Ray -> Double -> Double -> HitRecord -> Maybe HitRecord
@@ -70,7 +77,8 @@ instance Object Sphere where
                   let t = if root1 > tmin && root1 < tmax then root1 else root2
                       p' = at ray t
                       normal = (p' - center sphere) ^/ radius sphere
-                   in HitRecord p' normal t
+                      hr = HitRecord p' normal t True
+                   in setFaceNormal hr ray normal
          in result
 
 -- Returns the ray's coordinates depending on t
@@ -100,7 +108,7 @@ rayColor ray =
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
       sphere1 = Sphere (V3 (-0.6) 0.0 (-1.0)) 0.3
       sphere2 = Sphere (V3 0.6 0.0 (-1.0)) 0.3
-      tMaybe = (hit sphere1 ray (-3.0) 1000000.0 (HitRecord (V3 0.0 0.0 0.0) (V3 0.0 0.0 0.0) 0.0), hit sphere2 ray (-3.0) 1000000.0 (HitRecord (V3 0.0 0.0 0.0) (V3 0.0 0.0 0.0) 0.0))
+      tMaybe = (hit sphere1 ray (-3.0) 1000000.0 (HitRecord (V3 0.0 0.0 0.0) (V3 0.0 0.0 0.0) 0.0 True), hit sphere2 ray (-3.0) 1000000.0 (HitRecord (V3 0.0 0.0 0.0) (V3 0.0 0.0 0.0) 0.0 True))
    in case tMaybe of
         (Nothing, Nothing) -> (1.0 - a) *^ toColor + a *^ fromColor
         (Just hr, Nothing) ->
