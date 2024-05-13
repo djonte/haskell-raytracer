@@ -47,3 +47,9 @@ and this project adheres to the
     - sphere colored green as a function of varying y position in outward facing normal
     - sphere colored red as a function of varying x position in outward facing normal
     - sphere colored rgb as a function of varying x,y,z positions in outward facing normal
+
+## 0.1.4.0 - 2024-05-13
+### Added
+- Object class with one function, hit
+- Sphere data type (Object instance) that implements hit
+- Hit normals are adjusted dependion on if the hit was from the inside or outside of sphere, this is also stored in the HitRecord data type
