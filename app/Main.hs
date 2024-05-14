@@ -1,8 +1,8 @@
 module Main (main) where
 
+import Graphics.Image
 import Lib
 import Linear.V3
-import Graphics.Image
 
 main :: IO ()
 main = do
@@ -47,8 +47,15 @@ main = do
   let rt :: RayTracer
       rt = RayTracer px00_loc px_delta_u px_delta_v camera_center
 
+  -- World
+  let world :: HitList Sphere
+      world =
+        HitList
+          [ Sphere (V3 0 (-100.5) (-1)) 100,
+            Sphere (V3 0 0 (-1)) 0.7
+          ]
+
   -- Image generation
   let image :: Image VU RGB Double
-      image = makeImageR VU (fromInteger height, fromInteger width) (uncurry (rayGradient rt)) -- uncurry will transform gradient into (Int, Int) -> ...
+      image = makeImageR VU (fromInteger height, fromInteger width) (uncurry (rayGradient rt world)) -- uncurry will transform gradient into (Int, Int) -> ...
   writeImage "app/images/raytracing.jpg" image
-
