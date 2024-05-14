@@ -2,13 +2,15 @@ module Lib
   ( Color,
     Point,
     Ray (..),
-    RayTracer (..),
     at,
-    rayColor,
-    rayGradient,
     gradient,
+    Object,
     HitList (..),
     Sphere (..),
+    Interval (..),
+    HitRecord (..),
+    infinity,
+    hit,
   )
 where
 
@@ -29,14 +31,6 @@ data Ray = Ray
     direction :: V3 Double
   }
 
--- RayTracer data type to hold relevant constants (those that need to be visible at several places)
-data RayTracer = RayTracer
-  { px00Loc :: Point,
-    pxDeltaU :: V3 Double,
-    pxDeltaV :: V3 Double,
-    cameraCenter :: Point
-  }
-
 data HitRecord = HitRecord
   { p :: Point,
     normal :: V3 Double,
@@ -48,6 +42,9 @@ data Interval = Interval
   { tmin :: Double,
     tmax :: Double
   }
+
+infinity :: Double
+infinity = read "Infinity"
 
 size interval = tmax interval - tmin interval
 
@@ -131,35 +128,6 @@ hitSphere center radius ray =
    in if disc < 0
         then -1.0
         else (h - sqrt disc) / a
-
-infinity :: Double
-infinity = read "Infinity"
-
--- Function calculates the color of a given ray
--- Uses hitSphere to check if a sphere is hit by the ray
-rayColor :: (Object a) => Ray -> HitList a -> Color
-rayColor ray world =
-  let unitDir = L.normalize $ direction ray
-      a = 0.5 * (unitDir ^. _y + 1.0)
-      fromColor = V3 (127 / 255) (220 / 255) (232 / 255)
-      toColor = V3 (13 / 255) (70 / 255) (158 / 255)
-   in case hit world ray (Interval 0 infinity) (HitRecord (V3 0 0 0) (V3 0 0 0) 0 False) of
-        Nothing -> a *^ fromColor + (1.0 - a) *^ toColor
-        Just hr -> 0.5 *^ (normal hr + V3 1 1 1)
-
--- Takes a RayTracer, a pixel location i and j, returns a PixelRGB type with the color for that ray
-rayGradient :: (Object a) => RayTracer -> HitList a -> Int -> Int -> Pixel RGB Double
-rayGradient rt world j i =
-  -- j is rows, i is columns
-  let pxCenter = px00Loc rt + (fromIntegral i * pxDeltaU rt) + (fromIntegral j * pxDeltaV rt)
-      rayDirection = pxCenter - cameraCenter rt
-      ray = Ray (cameraCenter rt) (L.normalize rayDirection)
-      px_color = rayColor ray world
-   in pxRGB px_color
-
--- Custom functions so Color as a vector can be used
-pxRGB :: Color -> Pixel RGB Double
-pxRGB color = PixelRGB (color ^. _x) (color ^. _y) (color ^. _z)
 
 -- First gradient function
 gradient :: Int -> Int -> Pixel RGB Double
