@@ -44,6 +44,19 @@ data HitRecord = HitRecord
     frontFace :: Bool
   }
 
+data Interval = Interval
+  { tmin :: Double,
+    tmax :: Double
+  }
+
+size interval = tmax interval - tmin interval
+
+contains interval x = x >= tmin interval && x <= tmax interval
+
+surrounds interval x = x > tmin interval && x < tmax interval
+
+universe = Interval (-infinity) infinity
+
 setFaceNormal :: HitRecord -> Ray -> V3 Double -> HitRecord
 setFaceNormal hr ray outwardNormal =
   if dot (direction ray) outwardNormal < 0
@@ -54,7 +67,7 @@ degreesToRadians :: (Floating a) => a -> a
 degreesToRadians degrees = degrees * pi / 180
 
 class Object a where
-  hit :: a -> Ray -> Double -> Double -> HitRecord -> Maybe HitRecord
+  hit :: a -> Ray -> Interval -> HitRecord -> Maybe HitRecord
 
 data Sphere = Sphere
   { center :: Point,
@@ -67,20 +80,20 @@ clear :: HitList a
 clear = HitList [] -- redundant?
 
 instance (Object a) => Object (HitList a) where
-  hit (HitList []) _ _ _ _ = Nothing
-  hit (HitList l) ray tmin tmax hr = hit' l ray tmin tmax hr False tmax
+  hit (HitList []) _ _ _ = Nothing
+  hit (HitList l) ray interval hr = hit' l ray interval hr False (tmax interval)
     where
-      hit' [] _ _ _ hr' hitAnything _ = if hitAnything then Just hr' else Nothing
-      hit' (x : xs) ray' tmin' tmax' hr' hitAnything closest =
-        let result = hit x ray' tmin' tmax' hr'
+      hit' [] _ _ hr' hitAnything _ = if hitAnything then Just hr' else Nothing
+      hit' (x : xs) ray' interval' hr' hitAnything closest =
+        let result = hit x ray' interval' hr'
          in case result of
-              Nothing -> hit' xs ray' tmin' tmax' hr' hitAnything closest
-              Just hitRec -> hit' xs ray' tmin' tmax' hitRec True (t hitRec) -- investigate which hr is being used... hit shouldnt use hr so this should be fine
+              Nothing -> hit' xs ray' interval' hr' hitAnything closest
+              Just hitRec -> hit' xs ray' interval' hitRec True (t hitRec) -- investigate which hr is being used... hit shouldnt use hr so this should be fine
 
 instance Object Sphere where
   -- hit function for a sphere
   -- returns a hit record if the sphere is hit by the ray, otherwise Nothing
-  hit sphere ray tmin tmax hr =
+  hit sphere ray interval hr =
     let oc = center sphere - origin ray
         a = quadrance $ direction ray
         h = dot (direction ray) oc
@@ -89,13 +102,13 @@ instance Object Sphere where
      in let sqrtd = sqrt disc
             result
               | disc < 0 = Nothing
-              | root1 <= tmin || root1 >= tmax = if root2 <= tmin || root2 >= tmax then Nothing else Just hr' -- if root1 is not in the interval, check root2
+              | not (surrounds interval root1) = if not (surrounds interval root2) then Nothing else Just hr' -- if root1 is not in the interval, check root2
               | otherwise = Just hr' -- if root1 is in the interval, return the hit record
               where
                 root1 = (h - sqrtd) / a -- first root
                 root2 = (h + sqrtd) / a -- second root
                 hr' =
-                  let t = if root1 > tmin && root1 < tmax then root1 else root2
+                  let t = if root1 > tmin interval && root1 < tmax interval then root1 else root2
                       p' = at ray t
                       normal = (p' - center sphere) ^/ radius sphere
                       newHr = hr {p = p', normal = normal, t = t}
@@ -130,7 +143,7 @@ rayColor ray world =
       a = 0.5 * (unitDir ^. _y + 1.0)
       fromColor = V3 (127 / 255) (220 / 255) (232 / 255)
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
-   in case hit world ray 0 infinity (HitRecord (V3 0 0 0) (V3 0 0 0) 0 False) of
+   in case hit world ray (Interval 0 infinity) (HitRecord (V3 0 0 0) (V3 0 0 0) 0 False) of
         Nothing -> a *^ fromColor + (1.0 - a) *^ toColor
         Just hr -> 0.5 *^ (normal hr + V3 1 1 1)
 
