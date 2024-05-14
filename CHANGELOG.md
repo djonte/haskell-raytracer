@@ -54,3 +54,10 @@ and this project adheres to the
 - Sphere data type (Object instance) that implements hit
 - Hit normals are adjusted depending on if the hit was from the inside or outside of sphere, this is also stored in the HitRecord data type
 - Hittable list implemented, hit function implemented on the list
+
+## 0.1.5.0 - 2024-05-14
+### Added
+- World HitList to Lib and Main
+
+### Fixed
+- Recursive error because of variable naming inconsistencies
