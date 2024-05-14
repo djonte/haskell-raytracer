@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      Camera
       Lib
   other-modules:
       Paths_haskell_raytracer
