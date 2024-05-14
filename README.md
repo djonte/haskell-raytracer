@@ -37,6 +37,10 @@ Comment: *It should be noted that it is not quite possible to see any substantia
 #### 2 spheres, both with green and blue as a function of y
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/ef5828dc-4f2a-42fc-8f53-7519c19aedee)
 
+### World and antialiasing
+#### Sphere with visualized normals, and ground
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/2a8d1978-1f15-4b73-8e80-c38a53620430)
+
 
 ## How to run the project
 
