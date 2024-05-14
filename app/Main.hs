@@ -8,7 +8,9 @@ import Linear.V3
 main :: IO ()
 main = do
   -- Camera setup
-  let width = 400
+  let width :: Integer
+      aspectRatio :: Double
+      width = 400
       aspectRatio = 16.0 / 9.0
       camera = createCamera aspectRatio width
   -- World
