@@ -7,6 +7,8 @@ module Lib
     rayColor,
     rayGradient,
     gradient,
+    HitList (..),
+    Sphere (..),
   )
 where
 
@@ -48,6 +50,9 @@ setFaceNormal hr ray outwardNormal =
     then hr {frontFace = True, normal = outwardNormal}
     else hr {frontFace = False, normal = -outwardNormal}
 
+degreesToRadians :: (Floating a) => a -> a
+degreesToRadians degrees = degrees * pi / 180
+
 class Object a where
   hit :: a -> Ray -> Double -> Double -> HitRecord -> Maybe HitRecord
 
@@ -69,8 +74,8 @@ instance (Object a) => Object (HitList a) where
       hit' (x : xs) ray' tmin' tmax' hr' hitAnything closest =
         let result = hit x ray' tmin' tmax' hr'
          in case result of
-              Nothing -> hit' xs ray tmin tmax hr' hitAnything closest
-              Just hitRec -> hit' xs ray tmin tmax hitRec True (t hitRec) -- investigate which hr is being used... hit shouldnt use hr so this should be fine
+              Nothing -> hit' xs ray' tmin' tmax' hr' hitAnything closest
+              Just hitRec -> hit' xs ray' tmin' tmax' hitRec True (t hitRec) -- investigate which hr is being used... hit shouldnt use hr so this should be fine
 
 instance Object Sphere where
   -- hit function for a sphere
@@ -93,8 +98,8 @@ instance Object Sphere where
                   let t = if root1 > tmin && root1 < tmax then root1 else root2
                       p' = at ray t
                       normal = (p' - center sphere) ^/ radius sphere
-                      hr = hr {p = p', normal = normal, t = t}
-                   in setFaceNormal hr ray normal
+                      newHr = hr {p = p', normal = normal, t = t}
+                   in setFaceNormal newHr ray normal
          in result
 
 -- Returns the ray's coordinates depending on t
@@ -114,37 +119,29 @@ hitSphere center radius ray =
         then -1.0
         else (h - sqrt disc) / a
 
+infinity :: Double
+infinity = read "Infinity"
+
 -- Function calculates the color of a given ray
 -- Uses hitSphere to check if a sphere is hit by the ray
-rayColor :: Ray -> Color
-rayColor ray =
+rayColor :: (Object a) => Ray -> HitList a -> Color
+rayColor ray world =
   let unitDir = L.normalize $ direction ray
       a = 0.5 * (unitDir ^. _y + 1.0)
       fromColor = V3 (127 / 255) (220 / 255) (232 / 255)
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
-      sphere1 = Sphere (V3 (-0.6) 0.0 (-1.0)) 0.3
-      sphere2 = Sphere (V3 0.6 0.0 (-1.0)) 0.3
-      tMaybe = (hit sphere1 ray (-3.0) 1000000.0 (HitRecord (V3 0.0 0.0 0.0) (V3 0.0 0.0 0.0) 0.0 True), hit sphere2 ray (-3.0) 1000000.0 (HitRecord (V3 0.0 0.0 0.0) (V3 0.0 0.0 0.0) 0.0 True))
-   in case tMaybe of
-        (Nothing, Nothing) -> (1.0 - a) *^ toColor + a *^ fromColor
-        (Just hr, Nothing) ->
-          let diff = 0.5 * (normal hr ^. _y + 1)
-              color = V3 0 (2 * (diff ** 1)) (2 * (diff ** 1))
-           in color
-        (Nothing, Just hr) ->
-          let diff = 0.5 * (normal hr ^. _y + 1)
-              color = V3 0 (2 * (diff ** 1)) (2 * (diff ** 1))
-           in color
-        (Just _, Just _) -> (1.0 - a) *^ toColor + a *^ fromColor
+   in case hit world ray 0 infinity (HitRecord (V3 0 0 0) (V3 0 0 0) 0 False) of
+        Nothing -> a *^ fromColor + (1.0 - a) *^ toColor
+        Just hr -> 0.5 *^ (normal hr + V3 1 1 1)
 
 -- Takes a RayTracer, a pixel location i and j, returns a PixelRGB type with the color for that ray
-rayGradient :: RayTracer -> Int -> Int -> Pixel RGB Double
-rayGradient rt j i =
+rayGradient :: (Object a) => RayTracer -> HitList a -> Int -> Int -> Pixel RGB Double
+rayGradient rt world j i =
   -- j is rows, i is columns
   let pxCenter = px00Loc rt + (fromIntegral i * pxDeltaU rt) + (fromIntegral j * pxDeltaV rt)
       rayDirection = pxCenter - cameraCenter rt
       ray = Ray (cameraCenter rt) (L.normalize rayDirection)
-      px_color = rayColor ray
+      px_color = rayColor ray world
    in pxRGB px_color
 
 -- Custom functions so Color as a vector can be used
