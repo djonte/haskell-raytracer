@@ -9,7 +9,7 @@ where
 import Control.Lens hiding (at)
 import Graphics.Image as I
 import Lib hiding (center)
-import Linear.Metric as L (Metric (dot, quadrance), normalize)
+import Linear.Metric as L (normalize)
 import Linear.V3
 import Linear.Vector
 
@@ -21,6 +21,7 @@ data Camera = Camera
     pxDeltaV :: V3 Double
   }
 
+createCamera :: Double -> Integer -> Camera
 createCamera aspectRatio imageWidth =
   let imageHeight = let temp = floor (fromIntegral imageWidth / aspectRatio) in max temp 1 -- height should be at least 1
   -- Camera
