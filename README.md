@@ -41,6 +41,9 @@ Comment: *It should be noted that it is not quite possible to see any substantia
 #### Sphere with visualized normals, and ground
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/2a8d1978-1f15-4b73-8e80-c38a53620430)
 
+#### Above but with antialiasing (see edges)
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/bdceb2ed-b9a9-42a8-a5e7-8eb83036be9a)
+
 
 ## How to run the project
 
