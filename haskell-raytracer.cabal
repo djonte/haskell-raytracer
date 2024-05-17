@@ -39,6 +39,7 @@ library
     , hip
     , lens
     , linear
+    , random
   default-language: Haskell2010
 
 executable haskell-raytracer-exe
@@ -56,6 +57,7 @@ executable haskell-raytracer-exe
     , hip
     , lens
     , linear
+    , random
   default-language: Haskell2010
 
 test-suite haskell-raytracer-test
@@ -74,4 +76,5 @@ test-suite haskell-raytracer-test
     , hip
     , lens
     , linear
+    , random
   default-language: Haskell2010
