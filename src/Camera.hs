@@ -74,7 +74,7 @@ rayColor ray world maxDepth gen =
       a = 0.5 * (unitDir ^. _y + 1.0)
       fromColor = V3 (127 / 255) (220 / 255) (232 / 255)
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
-   in case hit world ray (Interval 0 infinity) (HitRecord (V3 0 0 0) (V3 0 0 0) 0 False) of
+   in case hit world ray (Interval 0.001 infinity) (HitRecord (V3 0 0 0) (V3 0 0 0) 0 False) of
         Nothing -> (a *^ (V3 0.5 0.7 1.0) + (1.0 - a) *^ V3 1.0 1.0 1.0, gen)
         Just hr ->
           let (dir, gen') = randomOnHemisphere (normal hr) gen
