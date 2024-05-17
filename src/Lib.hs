@@ -8,9 +8,11 @@ module Lib
     HitList (..),
     Sphere (..),
     Interval (..),
+    clamp,
     HitRecord (..),
     infinity,
     hit,
+    randomZeroToOne,
   )
 where
 
@@ -19,6 +21,7 @@ import Graphics.Image as I
 import Linear.Metric as L (Metric (dot, quadrance), normalize)
 import Linear.V3
 import Linear.Vector
+import System.Random
 
 -- Aliases for V3
 type Color = V3 Double -- this might not be needed
@@ -46,12 +49,22 @@ data Interval = Interval
 infinity :: Double
 infinity = read "Infinity"
 
+size :: Interval -> Double
 size interval = tmax interval - tmin interval
 
+contains :: Interval -> Double -> Bool
 contains interval x = x >= tmin interval && x <= tmax interval
 
+surrounds :: Interval -> Double -> Bool
 surrounds interval x = x > tmin interval && x < tmax interval
 
+clamp :: Interval -> Double -> Double
+clamp interval x
+  | x < tmin interval = tmin interval
+  | x > tmax interval = tmax interval
+  | otherwise = x
+
+universe :: Interval
 universe = Interval (-infinity) infinity
 
 setFaceNormal :: HitRecord -> Ray -> V3 Double -> HitRecord
@@ -111,6 +124,9 @@ instance Object Sphere where
                       newHr = hr {p = p', normal = normal, t = t}
                    in setFaceNormal newHr ray normal
          in result
+
+randomZeroToOne :: StdGen -> (Double, StdGen)
+randomZeroToOne = randomR (0.0, 1.0)
 
 -- Returns the ray's coordinates depending on t
 at :: Ray -> Double -> Point

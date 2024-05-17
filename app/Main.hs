@@ -12,7 +12,8 @@ main = do
       aspectRatio :: Double
       width = 400
       aspectRatio = 16.0 / 9.0
-      camera = createCamera aspectRatio width
+      samplesPerPixel = 100
+      camera = createCamera aspectRatio width samplesPerPixel
   -- World
   let world :: HitList Sphere
       world =

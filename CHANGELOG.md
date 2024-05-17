@@ -55,11 +55,12 @@ and this project adheres to the
 - Hit normals are adjusted depending on if the hit was from the inside or outside of sphere, this is also stored in the HitRecord data type
 - Hittable list implemented, hit function implemented on the list
 
-## 0.1.5.0 - 2024-05-14
+## 0.1.5.0 - 2024-05-17
 ### Added
 - World HitList to Lib and Main
 - Intervals
 - Moved constants and rendering logic to Camera.hs
+- Antialiasing
 
 ### Fixed
 - Recursive error because of variable naming inconsistencies
