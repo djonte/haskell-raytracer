@@ -67,15 +67,19 @@ pxRGB color = PixelRGB (color ^. _x) (color ^. _y) (color ^. _z)
 
 -- Function calculates the color of a given ray
 -- Uses hitSphere to check if a sphere is hit by the ray
-rayColor :: (Object a) => Ray -> HitList a -> Color
-rayColor ray world =
+rayColor :: (Object a) => Ray -> HitList a -> Integer -> StdGen -> (Color, StdGen)
+rayColor _ _ 0 gen = (V3 0 0 0, gen)
+rayColor ray world maxDepth gen =
   let unitDir = L.normalize $ direction ray
       a = 0.5 * (unitDir ^. _y + 1.0)
       fromColor = V3 (127 / 255) (220 / 255) (232 / 255)
       toColor = V3 (13 / 255) (70 / 255) (158 / 255)
    in case hit world ray (Interval 0 infinity) (HitRecord (V3 0 0 0) (V3 0 0 0) 0 False) of
-        Nothing -> a *^ fromColor + (1.0 - a) *^ toColor
-        Just hr -> 0.5 *^ (normal hr + V3 1 1 1)
+        Nothing -> (a *^ (V3 0.5 0.7 1.0) + (1.0 - a) *^ V3 1.0 1.0 1.0, gen)
+        Just hr ->
+          let (dir, gen') = randomOnHemisphere (normal hr) gen
+              (color, gen'') = rayColor (Ray (p hr) dir) world (maxDepth - 1) gen'
+           in (0.5 *^ color, gen'')
 
 sample :: (Object a) => Camera -> HitList a -> Integer -> Integer -> Integer -> StdGen -> Color
 sample cam world samplesPerPixel i j gen = sample' (V3 0.0 0.0 0.0) samplesPerPixel gen
@@ -84,8 +88,9 @@ sample cam world samplesPerPixel i j gen = sample' (V3 0.0 0.0 0.0) samplesPerPi
       | samples == 0 = color
       | otherwise =
           let (ray, gen'') = getRay cam i j gen'
-              pxColor = color + rayColor ray world
-           in sample' pxColor (samples - 1) gen''
+              (pxColor', gen''') = rayColor ray world 50 gen'' -- todo hardcoded max depth
+              pxColor = color + pxColor'
+           in sample' pxColor (samples - 1) gen'''
 
 -- Takes a RayTracer, a pixel location i and j, returns a PixelRGB type with the color for that ray
 render :: (Object a) => Camera -> HitList a -> Int -> Int -> Pixel RGB Double
