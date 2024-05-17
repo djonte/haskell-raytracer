@@ -64,3 +64,9 @@ and this project adheres to the
 
 ### Fixed
 - Recursive error because of variable naming inconsistencies
+
+
+## 0.2.0.0 - 2024-05-17
+### Added
+- Diffuse materials
+- Many pictures with various scenes
