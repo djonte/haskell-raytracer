@@ -44,6 +44,20 @@ Comment: *It should be noted that it is not quite possible to see any substantia
 #### Above but with antialiasing (see edges)
 ![image](https://github.com/djonte/haskell-raytracer/assets/90456387/bdceb2ed-b9a9-42a8-a5e7-8eb83036be9a)
 
+### A diffuse sphere
+#### One sphere
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/c87509da-9b89-4264-8e55-f9b34eba1e49)
+
+#### Two spheres
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/234731a1-8870-4198-96f0-56950730d8d2)
+
+#### Three spheres
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/a0338fd8-e11d-45a1-b1a1-5cfef45e6809)
+
+#### Four spheres
+![image](https://github.com/djonte/haskell-raytracer/assets/90456387/ea6d51d5-fe95-4684-860e-92e01cc03f3e)
+
+
 
 ## How to run the project
 
