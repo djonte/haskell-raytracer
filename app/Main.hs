@@ -19,7 +19,9 @@ main = do
       world =
         HitList
           [ Sphere (V3 0 (-100.5) (-1)) 100,
-            Sphere (V3 0 0 (-1)) 0.7
+            Sphere (V3 (-0.9) (-0.1) (-1.3)) 0.4,
+            Sphere (V3 (1.3) (-0.1) (-1.5)) 0.4,
+            Sphere (V3 (-0.0) 0 (-1)) 0.5
           ]
 
   -- Image generation

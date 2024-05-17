@@ -13,6 +13,7 @@ module Lib
     infinity,
     hit,
     randomZeroToOne,
+    randomOnHemisphere,
   )
 where
 
@@ -124,6 +125,35 @@ instance Object Sphere where
                       newHr = hr {p = p', normal = normal, t = t}
                    in setFaceNormal newHr ray normal
          in result
+
+randomVector :: StdGen -> (V3 Double, StdGen)
+randomVector gen =
+  let (r1, gen') = randomZeroToOne gen
+      (r2, gen'') = randomZeroToOne gen'
+      (r3, gen''') = randomZeroToOne gen''
+   in (V3 r1 r2 r3, gen''')
+
+randomVectorLimits :: Double -> Double -> StdGen -> (V3 Double, StdGen)
+randomVectorLimits min max gen =
+  let (r1, gen') = randomR (min, max) gen
+      (r2, gen'') = randomR (min, max) gen'
+      (r3, gen''') = randomR (min, max) gen''
+   in (V3 r1 r2 r3, gen''')
+
+randomInUnitSphere :: StdGen -> (V3 Double, StdGen)
+randomInUnitSphere gen =
+  let (p, gen') = randomVectorLimits (-1) 1 gen
+   in if quadrance p < 1 then (p, gen') else randomInUnitSphere gen'
+
+randomUnitVector :: StdGen -> (V3 Double, StdGen)
+randomUnitVector gen =
+  let (v, gen') = randomInUnitSphere gen
+   in (L.normalize v, gen')
+
+randomOnHemisphere :: V3 Double -> StdGen -> (V3 Double, StdGen)
+randomOnHemisphere normal gen =
+  let (onUnitSphere, gen') = randomUnitVector gen
+   in if dot onUnitSphere normal > 0.0 then (onUnitSphere, gen') else (-onUnitSphere, gen')
 
 randomZeroToOne :: StdGen -> (Double, StdGen)
 randomZeroToOne = randomR (0.0, 1.0)
